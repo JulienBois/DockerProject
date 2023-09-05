@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  back-dev:
+    depends_on:
+      - mongodb-dev
+    container_name: back-dev
+    image: back:dev
+    build:
+      context: server/
+      target: dev
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/develop
+    ports:
+      - 5000:5000
+    tty: true
+
+  front-dev:
+    container_name: front-dev
+    image: front:dev
+    build:
+      context: client/
+      target: dev
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/develop
+    ports:
+      - 3000:3000
+    tty: true
+
+  mongodb-dev:
+    networks:
+      - mongodb-network-dev
+    image: mongodb/mongodb-community-server:7.0.0-ubi8
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-db-data-dev:/db/data
+
+volumes:
+  mongo-db-data-dev:
+
+networks:
+  mongodb-network-dev:
