@@ -8,6 +8,7 @@ EXPOSE 5173
 #Spécification de l'utilisation du port 5173 pour le conteneur
 
 FROM node:18-alpine as build
+USER node
 WORKDIR /build
 COPY . .
 #Copie du répertoire source dans le répertoire build
