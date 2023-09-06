@@ -2,9 +2,14 @@ version: "3.9"
 services:
   back-dev:
     depends_on:
-      - mongodb-dev
+      - mongo
     container_name: back-dev
     image: back:dev
+    environment:
+      - SALT= ${SALT}
+    networks:
+      - mongodb-network-dev
+      - network-dev
     build:
       context: server/
       target: dev
@@ -12,12 +17,14 @@ services:
     volumes:
       - ./server:/develop
     ports:
-      - 5000:5000
+      - "5000:5000"
     tty: true
 
   front-dev:
     container_name: front-dev
     image: front:dev
+    networks:
+      - network-dev
     build:
       context: client/
       target: dev
@@ -28,7 +35,7 @@ services:
       - 3000:3000
     tty: true
 
-  mongodb-dev:
+  mongo:
     networks:
       - mongodb-network-dev
     image: mongodb/mongodb-community-server:7.0.0-ubi8
@@ -42,3 +49,4 @@ volumes:
 
 networks:
   mongodb-network-dev:
+  network-dev:

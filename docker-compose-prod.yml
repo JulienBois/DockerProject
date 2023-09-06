@@ -1,50 +1,46 @@
 version: "3.9"
 services:
-  back-dev:
+  back-prod:
     depends_on:
-      - mongodb-dev
-    container_name: back-dev
-    image: back:dev
+      - mongo
+    container_name: back-prod
+    image: back:prod
     networks:
-      - network-dev
+      - network-prod
+      - network-prod-mongo
     environment:
       - SALT=${SALT}
     build:
       context: server/
-      target: dev
+      target: prod
       dockerfile: Dockerfile
-    volumes:
-      - ./server:/develop
     ports:
       - 5000:5000
-    tty: true
 
-  front-dev:
-    container_name: front-dev
-    image: front:dev
+  front-prod:
+    container_name: front-prod
+    image: front:prod
     networks:
-      - network-dev
+      - network-prod
     build:
       context: client/
-      target: dev
+      target: prod
       dockerfile: Dockerfile
-    volumes:
-      - ./client:/develop
     ports:
-      - 3000:3000
-    tty: true
+      - 8080:80
 
-  mongodb-dev:
+  mongo:
     networks:
-      - network-dev
+      - network-prod-mongo
     image: mongodb/mongodb-community-server:7.0.0-ubi8
     ports:
       - 27017:27017
     volumes:
-      - mongo-db-data-dev:/db/data
+      - mongo-db-data-prod:/db/data
 
 volumes:
-  mongo-db-data-dev:
+  mongo-db-data-prod:
 
 networks:
-  network-dev:
+  network-prod-mongo:
+  network-prod:
