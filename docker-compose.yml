@@ -1,0 +1,52 @@
+version: "3.9" #Utilisation de la version 3.9
+services: #Spécification des services docker
+  back-dev: #Création du conteneur back-dev
+    depends_on: #On spécifie que le service dépend du service mongo qui va donc build le service mongo avant le service back-dev
+      - mongo
+    container_name: back-dev #Spécification du nom du conteneur
+    image: back:dev #Spécification du nom du conteneur
+    environment: #Spécification des variables d'environnement pour le service back-dev
+      - SALT= ${SALT}
+    networks: #Permet au service back-dev de communiquer avec le service mongo et le service front-dev
+      - mongodb-network-dev
+      - network-dev
+    build: #Spécification des builds du service
+      context: server/ #On spécifie que l'on doit aller dans le dossier server
+      target: dev #On spécifie que l'on doit aller dans le dossier pointer le stage dev
+      dockerfile: Dockerfile #On spécifie que l'on doit pointer le fichier dockerfile
+    volumes:
+      - ./server:/develop #Signifie que le dossier "./server" sera accessible à l'intérieur du conteneur à "/develop".
+    ports:
+      - "5000:5000" #Permet de mapper le port du conteneur au port 5000 de l'ordinateur
+    tty: true #Permet l'interaction avec le terminal sur le service
+
+  front-dev:
+    container_name: front-dev
+    image: front:dev
+    networks:
+      - network-dev #Définie que le service front-dev ne pourra communiquer qu'avec le back-dev
+    build:
+      context: client/
+      target: dev
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/develop
+    ports:
+      - 3000:3000
+    tty: true
+
+  mongo:
+    networks:
+      - mongodb-network-dev
+    image: mongodb/mongodb-community-server:7.0.0-ubi8
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-db-data-dev:/db/data
+
+volumes:
+  mongo-db-data-dev: #Spécification des différents volumes
+
+networks: #Spécification des différents network
+  mongodb-network-dev:
+  network-dev:
